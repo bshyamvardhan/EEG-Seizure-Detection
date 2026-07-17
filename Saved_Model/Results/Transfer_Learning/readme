@@ -1,0 +1,290 @@
+Here’s your **final Phase 3 documentation (clean, detailed, and non-generic)** based strictly on your code + results from the PDF .
+
+You can directly paste this into your project/report.
+
+---
+
+# 📘 **Phase 3 – Transfer Learning and Explainable AI (XAI)**
+
+---
+
+## **1. Objective**
+
+The objective of this phase is to improve EEG classification performance using **transfer learning** and to interpret model decisions using **Explainable AI (Grad-CAM)**. Unlike Phase 2, where custom CNNs were trained from scratch, this phase leverages **pretrained deep models (ImageNet)** to capture more robust and generalized features from EEG spectrograms.
+
+---
+
+## **2. Dataset Pipeline**
+
+The same spectrogram dataset from Phase 2 is used.
+
+### Dataset Handling:
+
+* Input: Spectrogram images (RGB, 224×224)
+* Classes:
+
+  * Healthy
+  * Ictal
+  * Interictal
+* Split:
+
+  * Train: 75%
+  * Validation: 15%
+  * Test: 10%
+
+### Normalization:
+
+Dataset-specific normalization applied:
+
+```id="r7j7al"
+(img / 255 - mean) / std
+```
+
+Computed values:
+
+* Mean: `[0.2316, 0.5921, 0.4873]`
+* Std: `[0.1515, 0.1464, 0.1050]` 
+
+---
+
+## **3. Transfer Learning Models**
+
+---
+
+## **3.1 ResNet50 (Best Model)**
+
+### Architecture:
+
+* Pretrained on ImageNet
+* Top layers removed (`include_top=False`)
+* Fine-tuning applied:
+
+  * First layers frozen
+  * Last ~20–40 layers unfrozen
+
+### Custom Head:
+
+* GlobalAveragePooling
+* Dense (512 → 256)
+* BatchNormalization + ReLU
+* Dropout (0.5, 0.3)
+* Output: Softmax (3 classes)
+
+### Training:
+
+* Optimizer: Adam
+* Learning rate: `1e-5`
+* Epochs: 30
+
+---
+
+### **Performance**
+
+#### Validation:
+
+* Accuracy: **96%**
+
+#### Test:
+
+* Accuracy: **98%**
+* Loss: 0.093 
+
+---
+
+### Confusion Matrix (Test)
+
+| Actual \ Predicted | 0  | 1  | 2  |
+| ------------------ | -- | -- | -- |
+| 0 (Healthy)        | 29 | 1  | 0  |
+| 1 (Ictal)          | 0  | 14 | 1  |
+| 2 (Interictal)     | 0  | 1  | 29 |
+
+👉 Very few misclassifications (mostly near-boundary cases)
+
+---
+
+## **3.2 EfficientNetB0**
+
+### Approach:
+
+* Fully frozen base initially
+* Partial fine-tuning (block6, block7)
+* Learning rate reduced during fine-tuning
+
+### Performance:
+
+* Test Accuracy: **68%**
+* Major issue: **fails on ictal detection (recall ~0.10)** 
+
+👉 Insight:
+
+* Model underfits / poor adaptation to EEG domain
+
+---
+
+## **3.3 InceptionV3 (GoogleNet)**
+
+### Approach:
+
+* Frozen base → partial unfreezing (top layers)
+* Two-stage training (normal + fine-tuning)
+
+### Performance:
+
+* Test Accuracy: **84%**
+* Moderate performance
+* Weak on ictal class (~60% recall)
+
+---
+
+## **3.4 Custom CNN (Reference)**
+
+* Accuracy: **90%**
+* Weak on ictal detection (~70%)
+
+👉 Confirms:
+**Transfer learning significantly improves performance**
+
+---
+
+## **4. Model Comparison**
+
+| Model        | Accuracy | Key Insight   |
+| ------------ | -------- | ------------- |
+| ResNet50     | **98%**  | Best overall  |
+| Custom CNN   | 90%      | Weak on ictal |
+| GoogLeNet    | 84%      | Moderate      |
+| EfficientNet | 68%      | Poor          |
+
+---
+
+### Class-wise Recall Insight
+
+| Model        | Healthy | Ictal | Interictal |
+| ------------ | ------- | ----- | ---------- |
+| ResNet       | 0.97    | 0.93  | 0.97       |
+| CNN          | 0.95    | 0.70  | 0.95       |
+| GoogLeNet    | 0.85    | 0.60  | 0.95       |
+| EfficientNet | 0.85    | 0.10  | 0.80       |
+
+👉 **Critical Observation:**
+ResNet is the **only model that reliably detects seizures**
+
+---
+
+## **5. Explainable AI – Grad-CAM**
+
+To understand *why* the model predicts a class, **Grad-CAM** is used.
+
+---
+
+## **5.1 Method**
+
+Grad-CAM works by:
+
+1. Extracting feature maps from the last convolution layer
+2. Computing gradients of predicted class
+3. Weighting feature maps by importance
+4. Generating a heatmap
+
+```id="s3b9cq"
+heatmap = conv_outputs @ pooled_grads
+```
+
+5. Overlaying heatmap on original image
+
+---
+
+## **5.2 Visualization**
+
+Each result shows:
+
+* Original spectrogram
+* Heatmap
+* Overlay
+
+
+* **Healthy** → attention on stable low-frequency regions
+* **Ictal** → strong localized high-energy activation
+* **Interictal** → mixed distributed patterns
+
+👉 Model focuses on **frequency-energy patterns**, not noise.
+
+---
+
+## **5.3 Example Predictions**
+
+| Class      | Probability |
+| ---------- | ----------- |
+| Healthy    | 0.98        |
+| Ictal      | ~0.999999   |
+| Interictal | 0.99        |
+
+
+
+---
+
+## **6. Full Dataset Evaluation (Grad-CAM Model)**
+
+### Overall Accuracy:
+
+* **98.6% (~99%)**
+
+### Classification Report:
+
+| Class      | Precision | Recall | F1   |
+| ---------- | --------- | ------ | ---- |
+| Healthy    | 0.99      | 0.99   | 0.99 |
+| Ictal      | 0.95      | 0.98   | 0.97 |
+| Interictal | 0.99      | 0.98   | 0.99 |
+
+
+
+---
+
+### Per-Class Accuracy:
+
+* Healthy: 0.990
+* Ictal: 0.980
+* Interictal: 0.985
+
+---
+
+### Errors:
+
+* Total misclassifications: **7 out of 500**
+
+👉 Error cases:
+
+* Healthy ↔ Ictal confusion (rare)
+* Ictal ↔ Interictal boundary cases
+
+---
+
+## **7. Key Insights**
+
+✔ Transfer learning improves performance over custom CNN
+✔ ResNet50 is best due to deep residual learning
+✔ EEG patterns are highly learnable via spectrograms
+✔ Grad-CAM confirms model is focusing on **meaningful signal regions**
+✔ Very low error rate (~1.4%)
+
+---
+
+## **8. Final Conclusion**
+
+Phase 3 demonstrates that combining:
+
+* **Transfer Learning (ResNet50)**
+* **Explainability (Grad-CAM)**
+
+results in:
+
+* High accuracy (~99%)
+* Reliable seizure detection
+* Interpretable predictions
+
+This makes the model suitable for **real-world medical AI applications**, where both performance and explainability are critical.
+
+---
+

@@ -1,0 +1,146 @@
+The Mean and Standard Deviation of the training set
+Found 375 images belonging to 3 classes.
+Mean: [0.23163886 0.5921696  0.48736835]
+Std: [0.15155396 0.14649126 0.10500305]
+
+============================
+ Model: Resnet50 (Imagenet)
+============================
+Test Loss: 0.09305290132761002
+Test Accuracy: 0.9800000190734863
+
+
+### Confusion Matrix
+
+| Actual \ Predicted | Class 0 | Class 1 | Class 2 |
+|--------------------|---------|---------|---------|
+| Class 0            | 29      | 1       | 0       |
+| Class 1            | 0       | 14      | 1       |
+| Class 2            | 0       | 1       | 29      |
+
+### Classification Report
+
+| Class | Precision | Recall | F1-Score | Support |
+|-------|----------|--------|----------|---------|
+| 0     | 1.00     | 0.97   | 0.98     | 30      |
+| 1     | 0.88     | 0.93   | 0.90     | 15      |
+| 2     | 0.97     | 0.97   | 0.97     | 30      |
+
+### Overall Performance
+
+| Metric       |Value |
+|--------------|------|
+| Accuracy     | 0.96 |
+| Macro Avg    | 0.95 |
+| Weighted Avg | 0.96 |
+
+============================
+ Model: EfficientNet
+============================
+Test Loss: 0.8569027781486511
+Test Accuracy: 0.6800000071525574
+
+### Confusion Matrix
+
+| Actual \ Predicted | Class 0 | Class 1 | Class 2 |
+|--------------------|---------|---------|---------|
+| Class 0            | 17      | 0       | 3       |
+| Class 1            | 4       | 1       | 5       |
+| Class 2            | 4       | 0       | 16      |
+
+### Classification Report
+
+| Class | Precision | Recall | F1-Score | Support |
+|-------|----------|--------|----------|---------|
+| 0     | 0.68     | 0.85   | 0.76     | 20      |
+| 1     | 1.00     | 0.10   | 0.18     | 10      |
+| 2     | 0.67     | 0.80   | 0.73     | 20      |
+
+### Overall Performance
+
+| Metric       |Value |
+|--------------|------|
+| Accuracy     | 0.68 |
+| Macro Avg    | 0.55 |
+| Weighted Avg | 0.63 |
+
+============================
+ Model: GoogleNet
+============================
+Test Loss: 0.32028090953826904
+Test Accuracy: 0.8399999737739563
+
+### Confusion Matrix
+
+| Actual \ Predicted | Class 0 | Class 1 | Class 2 |
+|--------------------|---------|---------|---------|
+| Class 0            | 17      | 0       | 3       |
+| Class 1            | 1       | 6       | 3       |
+| Class 2            | 0       | 1       | 19      |
+
+### Classification Report
+
+| Class | Precision| Recall | F1-Score | Support |
+|-------|----------|--------|----------|---------|
+| 0     | 0.94     | 0.85   | 0.89     | 20      |
+| 1     | 0.86     | 0.60   | 0.71     | 10      |
+| 2     | 0.76     | 0.95   | 0.84     | 20      |
+
+### Overall Performance
+
+| Metric       |Value |
+|--------------|------|
+| Accuracy     | 0.84 |
+| Macro Avg    | 0.82 |
+| Weighted Avg | 0.84 |
+
+
+============================
+ Model: Custom CNN
+============================
+Test Loss: 0.44287100434303284
+Test Accuracy: 0.8999999761581421
+
+### Confusion Matrix
+
+| Actual \ Predicted | Class 0 | Class 1 | Class 2 |
+|--------------------|---------|---------|---------|
+| Class 0            | 19      | 0       | 1       |
+| Class 1            | 0       | 7       | 3       |
+| Class 2            | 0       | 1       | 19      |
+
+### Classification Report
+
+| Class | Precision| Recall | F1-Score | Support |
+|-------|----------|--------|----------|---------|
+| 0     | 1.00     | 0.95   | 0.97     | 20      |
+| 1     | 0.88     | 0.70   | 0.78     | 10      |
+| 2     | 0.83     | 0.95   | 0.88     | 20      |
+
+### Overall Performance
+
+| Metric       | Value |
+|--------------|------|
+| Accuracy     | 0.90 |
+| Macro Avg    | 0.88 |
+| Weighted Avg | 0.90 |
+
+
+
+============================
+         Comparision
+============================
+| Model        | Accuracy      | Macro F1 | Key Issue              |
+| ------------ | ------------- | -------- | ---------------------- |
+| ResNet50     |0.96–0.98      | 0.95     | Best overall           |
+| Custom CNN   | 0.90          | 0.88     | Weak on Class 1        |
+| GoogLeNet    | 0.84          | 0.82     | Struggles on Class 1   |
+| EfficientNet | 0.68          | 0.55     | Fails on Class 1 badly |
+
+class-wise recall:
+| Model        | Class 0 | Class 1 | Class 2 | Overall view                    |
+| ------------ | ------- | ------- | ------- | ------------------------------- |
+| ResNet       | 0.97    | 0.93    | 0.97    | Best overall                    |
+| CNN          | 0.95    | 0.70    | 0.95    | Good but weak seizure detection |
+| GoogLeNet    | 0.85    | 0.60    | 0.95    | Moderate                        |
+| EfficientNet | 0.85    | 0.10    | 0.80    | Worst                           |

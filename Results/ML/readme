@@ -1,0 +1,313 @@
+
+---
+
+# 📘 **Phase 1 Documentation – EEG Seizure Classification using Machine Learning**
+
+---
+
+## **1. Objective**
+
+The objective of Phase 1 is to classify EEG signals into three categories — **healthy, ictal (seizure), and interictal** — using classical machine learning techniques. Unlike deep learning approaches, this phase focuses on **feature engineering and statistical learning methods** to extract meaningful patterns from EEG signals.
+
+---
+
+## **2. Dataset Description**
+
+The dataset used is the **University of Bonn EEG dataset**, consisting of 5 subsets:
+
+* Z, O → Healthy
+* N, F → Interictal
+* S → Ictal
+
+Each file contains a **single-channel EEG time-series signal** sampled at **173.61 Hz**.
+
+### Dataset Summary:
+
+* Total samples: **500**
+* Final classes:
+
+  * Healthy: 200 samples
+  * Interictal: 200 samples
+  * Ictal: 100 samples
+* No missing values present 
+
+---
+
+## **3. Signal Preprocessing**
+
+Each EEG signal undergoes preprocessing to remove noise and standardize the signal:
+
+### Steps:
+
+1. **Mean removal**
+
+   * Eliminates DC offset
+
+2. **Bandpass filtering (0.5–40 Hz)**
+
+   * Removes irrelevant frequencies
+   * Retains EEG-relevant components
+
+3. **Sub-band decomposition**
+   EEG signal is divided into frequency bands using Butterworth filters:
+
+   * Delta: 0.5–4 Hz
+   * Theta: 4–8 Hz
+   * Alpha: 8–13 Hz
+   * Beta: 13–30 Hz
+   * Gamma: 30–40 Hz
+
+This enables extraction of **frequency-specific information** critical for seizure detection.
+
+---
+
+## **4. Feature Extraction**
+
+A total of **15 features** are extracted per EEG signal, grouped into three categories:
+
+---
+
+### **4.1 Statistical Features (5)**
+
+These describe amplitude distribution:
+
+* Mean
+* Standard Deviation
+* Variance
+* Skewness
+* Kurtosis
+
+👉 Captures signal shape and variability.
+
+---
+
+### **4.2 Frequency Domain Features (5)**
+
+Band power is computed for each EEG band:
+
+* Delta Power
+* Theta Power
+* Alpha Power
+* Beta Power
+* Gamma Power
+
+👉 Important because seizures alter energy distribution across frequencies.
+
+---
+
+### **4.3 Entropy Features (5)**
+
+These measure signal complexity and randomness:
+
+* ShanInter Entropy
+* Log Energy Entropy
+* Approximate Entropy
+* Sample Entropy
+* Spectral Entropy
+
+👉 According to the results, **entropy features are the most important** 
+
+---
+
+### **Final Feature Vector**
+
+Each sample is represented as:
+
+```id="qghh1j"
+[15-dimensional feature vector]
+```
+
+All features are stored in:
+
+```id="fxtd9n"
+EEG_Feature_Dataset.csv
+```
+
+---
+
+## **5. Data Preprocessing (ML Pipeline)**
+
+### 5.1 Label Encoding
+
+Class labels converted into numeric form:
+
+* Healthy → 0
+* Ictal → 1
+* Interictal → 2
+
+---
+
+### 5.2 Feature Scaling
+
+* StandardScaler used
+* Ensures all features have:
+
+  * Mean = 0
+  * Std = 1
+
+👉 Required for SVM performance.
+
+---
+
+### 5.3 Train-Test Split
+
+* Train: 70%
+* Test: 30%
+* Stratified split used to maintain class balance
+
+---
+
+## **6. Feature Selection**
+
+Feature importance is computed using **Random Forest**.
+
+### Top 10 Features (from your results):
+
+1. Sample Entropy
+2. Approximate Entropy
+3. Beta Power
+4. Log Energy Entropy
+5. Theta Power
+6. Alpha Power
+7. Delta Power
+8. Standard Deviation
+9. Variance
+10. Spectral Entropy 
+
+👉 Insight:
+* Entropy + frequency features dominate
+* Raw statistical features are less influential
+
+Only these top 10 features are used for final training.
+
+---
+
+## **7. Model Training**
+
+Two machine learning models are used:
+
+---
+
+### **7.1 Support Vector Machine (SVM)**
+
+* Kernel: RBF (Radial Basis Function)
+* Suitable for Inter-linear decision boundaries
+* Works well with high-dimensional data
+
+---
+
+### **7.2 Random Forest Classifier**
+
+* Ensemble of decision trees
+* Uses majority voting
+* Handles Inter-linearity and feature interactions
+* Also used for feature selection
+
+---
+
+## **8. Model Evaluation**
+
+Evaluation is performed using:
+
+* Accuracy
+* Balanced Accuracy
+* Precision
+* Recall (Sensitivity)
+* Specificity
+* F1 Score
+* Confusion Matrix
+
+---
+
+### Additional Medical Metrics:
+
+* **Sensitivity (Ictal detection)**
+  → Measures seizure detection ability
+
+* **Specificity**
+  → Measures correct Inter-seizure classification
+
+---
+
+## **9. Results**
+
+### **SVM (RBF)**
+
+* Accuracy: **93.33%**
+* Balanced Accuracy: **93.33%**
+* Precision: **93.33%**
+* Sensitivity: **96.67%**
+* Specificity: **91.67%**
+* F1 Score: **93.31%**
+
+---
+
+### **Random Forest**
+
+* Accuracy: **96.67%**
+* Balanced Accuracy: **96.11%**
+* Precision: **96.77%**
+* Sensitivity: **96.67%**
+* Specificity: **95.83%**
+* F1 Score: **96.67%** 
+
+---
+
+## **10. Model Comparison**
+
+| Model         | Accuracy   | Key Strength             |
+| ------------- | ---------- | ------------------------ |
+| SVM           | 93.33%     | Good generalization      |
+| Random Forest | **96.67%** | Best overall performance |
+
+👉 **Best Model: Random Forest**
+
+Reason:
+
+* Higher accuracy
+* Better balance between sensitivity & specificity
+* More robust to feature variations
+
+---
+
+## **11. Confusion Matrix Insights**
+
+From your results (page 10 image):
+
+* Healthy → very high correct classification
+* Ictal → strong detection (critical success)
+* Interictal → slight confusion with healthy
+
+👉 This is expected due to similar patterns.
+
+---
+
+## **12. Key Contributions of Phase 1**
+
+✔ Designed complete feature extraction pipeline
+✔ Extracted statistical, frequency, and entropy features
+✔ Implemented feature selection using RF
+✔ Built and compared SVM & RF models
+✔ Achieved high classification accuracy (~96.7%)
+✔ Identified entropy features as dominant
+
+---
+
+## **13. Limitations**
+
+* Feature engineering dependent
+* No temporal modeling
+* Requires domain knowledge
+* Cannot scale easily to raw signal complexity
+
+---
+
+## **14. Transition to Phase 2**
+
+Limitations of ML approach led to:
+
+👉 Moving to **deep learning (CNN on spectrograms)**
+👉 Avoid manual feature extraction
+👉 Learn features automatically
+
+---

@@ -1,0 +1,108 @@
+## **Phase 2 – EEG Spectrogram Classification using Customized CNN**
+
+In this phase, the EEG dataset (University of Bonn) originally available as text files was converted into spectrogram images to enable deep learning-based classification. The dataset consists of five subsets (Z, O, N, F, S), which were grouped into three clinical classes: **healthy (Z, O – 200 samples), interictal (N, F – 100 samples), and ictal (S – 100 samples)**.
+
+### **Spectrogram Generation**
+
+Each EEG signal was loaded using NumPy and transformed into a time–frequency representation using the Short-Time Fourier Transform (STFT) via `scipy.signal.spectrogram`. A sampling frequency of **173.61 Hz** was used, consistent with the dataset specifications. The resulting power spectrum was converted to the logarithmic scale using `10 * log10(Sxx)` to enhance visibility of frequency components.
+
+The spectrogram was plotted using `matplotlib.pyplot.pcolormesh` with smooth shading and without axes to remove unnecessary visual noise. Images were saved as `.png` files with tight bounding boxes to ensure only relevant signal information is retained. All images were generated in **RGB format**.
+
+The output directory structure was organized into three class folders:
+
+```
+spectrogram_dataset/
+    healthy/
+    interictal/
+    ictal/
+```
+
+This process resulted in a total of **400 spectrogram images**, preserving class labels and enabling direct use with CNN-based models.
+---
+
+### **Dataset Preparation and Splitting**
+The generated spectrogram dataset was compressed and uploaded to Google Colab. After extraction, the dataset was manually split into:
+
+* Training set: 75%
+* Validation set: 15%
+* Test set: 10%
+
+Splitting was performed class-wise after shuffling to maintain class balance and avoid biased learning.
+
+### **Preprocessing and Normalization**
+Instead of simple rescaling, dataset-specific normalization was applied. The mean and standard deviation were computed from the training data and used to normalize all images:
+[
+\text{Normalized Image} = \frac{(I/255 - \mu)}{\sigma}
+]
+
+This standardization ensures stable gradients and faster convergence. Additionally, light augmentation (small shifts and zoom) was applied only to the training data to improve generalization without distorting EEG patterns.
+### **Model Design and Training**
+A custom CNN architecture was designed as the baseline model with multiple convolutional and pooling layers followed by dense layers and a softmax output for three-class classification. To improve performance, several architectural variations were explored, including increased depth, larger filters, different kernel sizes, dropout regularization, and batch normalization.
+All models were trained using the Adam optimizer (learning rate = 0.0001) and categorical cross-entropy loss. Early stopping and learning rate reduction were used to prevent overfitting. Reproducibility was ensured by fixing random seeds and enabling deterministic TensorFlow operations.
+
+### **Results**
+The models were evaluated using accuracy, precision, recall, and F1-score. The best performance was achieved using the **Dropout-based CNN**, with a test accuracy of approximately **98%**, indicating strong generalization. Other variants achieved around 96%, while the baseline model reached ~94%.
+
+### **Conclusion**
+This phase demonstrates that EEG signals, when converted into spectrogram images, can be effectively classified using CNN architectures. The use of logarithmic spectrogram scaling, proper normalization, and regularization techniques significantly improves model performance and stability, forming a solid foundation for advanced models in subsequent phases.
+
+| Model Variant | Key Change                 |
+| ------------- | -------------------------- |
+| Baseline      | Standard CNN               |
+| Depth         | Added extra Conv layer     |
+| Filters       | Increased filter size      |
+| Kernel        | Used larger kernel (5×5)   |
+| Dropout       | Added Dropout (0.5)        |
+| BatchNorm     | Added normalization layers |
+
+Optimizer: Adam
+LR: 0.0001
+Loss: Categorical Crossentropy
+Used BatchNorm and ReducedLRonPlateu, to reduce overfitting
+
+Outputs:
+| Model     | Test Accuracy  |
+| --------- | -------------- |
+| Baseline  | 94%            |
+| Depth     | 96%            |
+| Filters   | 96%            |
+| Kernel    | 96%            |
+| Dropout   | **98% (Best)** |
+| BatchNorm | 96%            |
+
+
+Final Proposed Architecture:
+def model_dropout():
+    model = Sequential([
+        Conv2D(32,(3,3),activation='relu',input_shape=(224,224,3)),
+        MaxPooling2D(),
+
+        Conv2D(64,(3,3),activation='relu'),
+        MaxPooling2D(),
+
+        Conv2D(128,(3,3),activation='relu'),
+        MaxPooling2D(),
+
+        Flatten(),
+        Dense(128,activation='relu'),
+        Dropout(0.5),   
+        Dense(3,activation='softmax')
+    ])
+    return model
+
+metrics:
+| Metric                   | Value  |
+| ------------------------ | ------ |
+| Best Validation Accuracy | 0.9867 |
+| Test Accuracy            | 0.9800 |
+| F1 Score                 | 0.9799 |
+| Precision                | 0.9809 |
+| Recall                   | 0.9800 |
+
+
+| Class | Precision | Recall | F1-Score | Support |
+| ----- | --------- | ------ | -------- | ------- |
+| 0     | 0.95      | 1.00   | 0.98     | 20      |
+| 1     | 1.00      | 1.00   | 1.00     | 10      |
+| 2     | 1.00      | 0.95   | 0.97     | 20      |
+

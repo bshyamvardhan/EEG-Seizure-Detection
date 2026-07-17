@@ -1,0 +1,117 @@
+
+# EEG Seizure Classification using Machine Learning
+
+## 📌 Project Overview
+This project focuses on classifying EEG brain signals into three categories:
+- Healthy
+- Ictal (seizure)
+- Nonictal
+
+Machine Learning models such as Support Vector Machine (SVM) and Random Forest (RF) are used for classification.
+
+---
+
+## 📊 Dataset Description
+- Total samples: 500
+- Features: 15 EEG-based statistical and frequency features
+- Classes:
+  - healthy
+  - ictal
+  - nonictal
+
+No missing values were found in the dataset.
+------------------------------
+CLASS MAPPING
+------------------------------
+healthy   -> 0
+ictal     -> 1
+nonictal  -> 2
+
+
+⚙️ Methodology
+
+1. Data Preprocessing
+- Label Encoding applied to convert categorical labels into numerical form
+- Feature scaling performed using StandardScaler for uniform feature range
+
+2. Feature Selection
+- Random Forest feature importance used to rank features
+- Top 10 most important features selected for classification
+- Entropy-based and frequency-domain features contributed most
+
+3. Model Training
+Two machine learning models were trained:
+
+✔ Support Vector Machine (SVM)
+- Kernel: Radial Basis Function (RBF)
+- Suitable for non-linear classification of EEG signals
+
+✔ Random Forest Classifier
+- Ensemble learning method using multiple decision trees
+- Provides robust performance and feature importance ranking
+
+
+SAMPLING_FREQ = 173.61
+DT = 1 / SAMPLING_FREQ
+SAMPLES = 4096
+
+| Band  | Range (Hz) | Meaning        |
+| ----- | ---------- | -------------- |
+| Delta | 0.5–4      | Deep sleep     |
+| Theta | 4–8        | Drowsiness     |
+| Alpha | 8–13       | Relaxed        |
+| Beta  | 13–30      | Active         |
+| Gamma | >30        | Cognitive load |
+
+------------------------------
+FEATURE SELECTION (Random Forest)
+------------------------------
+Top 10 Features:
+1. SampleEntropy
+2. ApproxEntropy
+3. BetaPower
+4. LogEnergyEntropy
+5. ThetaPower
+6. AlphaPower
+7. DeltaPower
+8. Std
+9. Variance
+10. SpectralEntropy
+
+------------------------------
+MODEL PERFORMANCE
+------------------------------
+
+SVM (RBF):
+- Accuracy: 93.33%
+- Balanced Accuracy: 93.33%
+- Precision: 93.33%
+- Recall (Sensitivity): 96.67%
+- Specificity: 91.67%
+- F1 Score: 93.31%
+
+Random Forest:
+- Accuracy: 96.67%
+- Balanced Accuracy: 96.11%
+- Precision: 96.77%
+- Recall (Sensitivity): 96.67%
+- Specificity: 95.83%
+- F1 Score: 96.67%
+
+------------------------------
+FINAL MODEL COMPARISON
+------------------------------
+Best Model: Random Forest
+Reason: Higher accuracy and balanced performance across all classes.
+
+------------------------------
+CONFUSION MATRIX INSIGHT
+------------------------------
+- Healthy: High correct classification
+- Ictal: Strong detection (important for seizure detection)
+- Nonictal: Minor confusion with healthy class
+
+------------------------------
+CONCLUSION
+------------------------------
+Random Forest performed better than SVM for EEG seizure classification, achieving 96.67% accuracy. Entropy-based and frequency-domain features contributed most to classification performance.

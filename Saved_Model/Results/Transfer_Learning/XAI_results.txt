@@ -1,0 +1,41 @@
+class_names = ["healthy", "ictal", "interictal"]
+examples:
+==============================
+Image: /content/spectrogram_dataset/healthy/O028.png
+Prediction probabilities: [0.98075473 0.0161843  0.00306091]
+Predicted class: healthy
+
+==============================
+Image: /content/spectrogram_dataset/ictal/S044.png
+Prediction probabilities: [1.7844523e-07 9.9999928e-01 6.5008658e-07]
+Predicted class: ictal
+
+==============================
+Image: /content/spectrogram_dataset/interictal/F021.png
+Prediction probabilities: [0.00100973 0.00402346 0.9949668 ]
+Predicted class: interictal
+
+
+============================
+        GradCAM results
+============================
+### Classification Report
+
+| Class        | Precision | Recall | F1-Score | Support |
+|-------------|----------|--------|----------|---------|
+| Healthy     | 0.99     | 0.99   | 0.99     | 200     |
+| Ictal       | 0.95     | 0.98   | 0.97     | 100     |
+| Interictal  | 0.99     | 0.98   | 0.99     | 200     |
+
+### Overall Performance
+
+| Metric       | Value|
+|--------------|------|
+| Accuracy     | 0.99 |
+| Macro Avg    | 0.98 |
+| Weighted Avg | 0.99 |
+
+📊 Per-Class Accuracy:
+healthy: 0.9900
+ictal: 0.9800
+interictal: 0.9850

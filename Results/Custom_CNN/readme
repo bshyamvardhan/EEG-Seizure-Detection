@@ -1,0 +1,265 @@
+# 🧠 EEG Spectrogram Classification using Custom CNN
+
+## 📌 Overview
+
+This project focuses on classifying EEG signals into **Healthy, Interictal, and Ictal** classes using deep learning.
+The original EEG signals (text format) are converted into **spectrogram images**, which are then used as input to a **custom Convolutional Neural Network (CNN)**.
+
+---
+
+## 🎯 Objective
+
+* Convert EEG signals → spectrogram images
+* Build and analyze **custom CNN architectures**
+* Perform **ablation study** on different CNN variations
+* Achieve accurate classification of brain states
+
+---
+
+## 📂 Dataset
+
+### Source
+
+* **University of Bonn EEG Dataset**
+
+### Original Format
+
+* `.txt` files (time-series EEG signals)
+
+### Class Mapping
+
+| Dataset Folder | Class      |
+| -------------- | ---------- |
+| Z, O           | Healthy    |
+| N, F           | Interictal |
+| S              | Ictal      |
+
+### Final Distribution
+
+| Class      | Samples |
+| ---------- | ------- |
+| Healthy    | 200     |
+| Interictal | 100     |
+| Ictal      | 100     |
+| **Total**  | **400** |
+
+---
+
+## 🔄 Step 1: Spectrogram Generation
+
+EEG signals are converted into spectrogram images using **STFT**.
+
+### Key Details
+
+* Sampling frequency: **173.61 Hz**
+* Transformation: `scipy.signal.spectrogram`
+* Log scaling: `10 * log10(Sxx)`
+* Output: **RGB PNG images**
+
+### Output Structure
+
+```
+spectrogram_dataset/
+    healthy/
+    interictal/
+    ictal/
+```
+
+---
+
+## 📦 Step 2: Dataset Preparation
+
+### Upload & Extraction
+
+* Dataset zipped → uploaded to **Google Colab**
+* Extracted using:
+
+```
+!unzip spectrogram_dataset.zip
+```
+
+### Train / Val / Test Split
+
+* Train: **75%**
+* Validation: **15%**
+* Test: **10%**
+
+### Final Structure
+
+```
+eeg_dataset/
+    train/
+    val/
+    test/
+        healthy/
+        interictal/
+        ictal/
+```
+
+---
+
+## ⚙️ Step 3: Preprocessing
+
+### Normalization
+
+Instead of simple rescaling, dataset-specific normalization is used:
+
+```
+(I / 255 - mean) / std
+```
+
+* Mean & Std computed from training data
+* Improves convergence and stability
+
+### Data Augmentation (Train only)
+
+* Width shift: 0.05
+* Height shift: 0.05
+* Zoom: 0.05
+
+---
+
+## 🧠 Step 4: Model Architecture
+
+### Baseline CNN
+
+* Conv → ReLU → MaxPool
+* 3 convolution blocks
+* Fully connected layers
+* Softmax output (3 classes)
+
+---
+
+## 🔬 Step 5: Ablation Study (Key Contribution)
+
+Multiple CNN variants were tested:
+
+| Model     | Modification        |
+| --------- | ------------------- |
+| Baseline  | Standard CNN        |
+| Depth     | Extra Conv layer    |
+| Filters   | Increased filters   |
+| Kernel    | Larger kernel (5×5) |
+| Dropout   | Dropout (0.5)       |
+| BatchNorm | Batch normalization |
+
+---
+
+## 🏋️ Step 6: Training
+
+### Configuration
+
+* Optimizer: Adam
+* Learning Rate: 0.0001
+* Loss: Categorical Crossentropy
+* Epochs: 20
+
+### Callbacks
+
+* EarlyStopping
+* ReduceLROnPlateau
+
+### Reproducibility
+
+* Fixed random seeds
+* Deterministic TensorFlow operations
+
+---
+
+## 📊 Step 7: Evaluation Metrics
+
+* Accuracy
+* Precision
+* Recall
+* F1 Score
+* Classification Report
+
+---
+
+## 📈 Results
+
+### Model Performance
+
+| Model       | Test Accuracy  |
+| ----------- | -------------- |
+| Baseline    | 94%            |
+| Depth       | 96%            |
+| Filters     | 96%            |
+| Kernel      | 96%            |
+| BatchNorm   | 96%            |
+| **Dropout** | **98% (Best)** |
+
+---
+
+### 🏆 Best Model: Dropout CNN
+
+* Accuracy: **98%**
+* F1 Score: ~0.98
+* Balanced performance across all classes
+* Reduced overfitting → better generalization
+
+---
+
+## 📉 Visualization
+
+* Model comparison bar chart
+* Training vs Validation accuracy curves
+
+---
+
+## 🚀 Key Contributions
+
+✔ EEG → Spectrogram conversion pipeline
+✔ Custom CNN architecture design
+✔ Systematic ablation study
+✔ Dataset-specific normalization
+✔ Reproducible training setup
+✔ High classification accuracy (98%)
+
+---
+
+## ⚠️ Limitations
+
+* Small dataset size
+* No temporal modeling (CNN only)
+* No cross-validation
+* Spectrogram-only approach (no raw EEG fusion)
+
+---
+
+## 🔮 Future Work
+
+* Transfer Learning (ResNet, EfficientNet)
+* CNN + LSTM hybrid models
+* Attention mechanisms
+* Raw EEG + Spectrogram fusion
+* Real-time seizure detection system
+
+---
+
+## 🛠️ Technologies Used
+
+* Python
+* NumPy
+* SciPy
+* Matplotlib
+* TensorFlow / Keras
+* Scikit-learn
+
+---
+
+## ▶️ How to Run
+
+1. Generate spectrograms from EEG signals
+2. Zip dataset and upload to Colab
+3. Extract dataset
+4. Run training script
+5. Evaluate results
+
+---
+
+## 📌 Conclusion
+
+This project demonstrates that transforming EEG signals into spectrogram images allows CNN models to effectively classify brain activity. The use of normalization and dropout significantly improves performance, achieving **98% accuracy**, making this approach suitable for medical signal classification tasks.
+
+---
